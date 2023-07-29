@@ -8,6 +8,6 @@ const PORT = process.env.PORT || 5000;
 
 const httpServer = http.createServer(app);
 
-httpServer.listen(HOST, PORT, () =>
+httpServer.listen(PORT, HOST, () =>
   console.log(`Server is listening http://${HOST}:${PORT}`)
 );
