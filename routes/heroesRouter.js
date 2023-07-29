@@ -1,8 +1,8 @@
 const { Router } = require('express');
+const { heroesController } = require('../controllers');
 
 const heroesRouter = Router();
 
-// TODO import
 heroesRouter
   .route('/')
   .post(heroesController.createHero)

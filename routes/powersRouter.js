@@ -1,8 +1,8 @@
 const { Router } = require('express');
+const { powersController } = require('../controllers');
 
 const powersRouter = Router();
 
-// TODO import
 powersRouter.get('/', powersController.getPowers);
 
 module.exports = powersRouter;
