@@ -1,5 +1,6 @@
 const path = require('path');
 
+// Теперь будет доступ к .env-файлу
 require('dotenv').config();
 
 module.exports = {
