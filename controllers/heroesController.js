@@ -2,12 +2,13 @@ const createHttpError = require('http-errors');
 const path = require('path');
 const _ = require('lodash');
 const { Hero } = require('./../db/models');
+const { IMAGES_FOLDER } = require('./../constants');
 
 module.exports.createHero = async (req, res, next) => {
   const { body, file } = req;
 
   if (file) {
-    body.image = path.join('images', file.filename);
+    body.image = path.join(IMAGES_FOLDER, file.filename);
   }
 
   try {
