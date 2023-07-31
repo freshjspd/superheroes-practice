@@ -1,4 +1,3 @@
-const createHttpError = require('http-errors');
 const { Power } = require('../db/models');
 
 module.exports.getPowers = async (req, res, next) => {
