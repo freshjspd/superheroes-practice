@@ -1,7 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const httpClient = axios.create({ baseURL: 'http://localhost:5001/api' });
+const httpClient = axios.create({
+  baseURL: 'http://localhost:5001/api',
+});
 
 const initialState = {
   heroes: [],
