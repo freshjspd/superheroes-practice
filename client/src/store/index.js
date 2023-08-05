@@ -11,7 +11,7 @@ const store = configureStore({ reducer });
 
 export default store;
 
-// {
+//  state ={
 //   heroData: {
 //     heroes: [],
 //     isFetching: false,
