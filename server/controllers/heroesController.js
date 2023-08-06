@@ -29,6 +29,7 @@ module.exports.createHero = async (req, res, next) => {
 module.exports.getHeroes = async (req, res, next) => {
   try {
     const foundHeroes = await Hero.findAll({
+      order: ['id'],
       attributes: { exclude: ['createdAt', 'updatedAt'] },
     });
 
