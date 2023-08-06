@@ -38,6 +38,47 @@ module.exports.getHeroes = async (req, res, next) => {
   }
 };
 
-module.exports.updateHero = async (req, res, next) => {};
+module.exports.updateHero = async (req, res, next) => {
+  const {
+    body,
+    params: { heroId },
+  } = req;
 
-module.exports.deleteHero = async (req, res, next) => {};
+  try {
+    const [updatedHeroCount, [updatedHero]] = await Hero.update(body, {
+      where: {
+        id: heroId,
+      },
+      raw: true,
+      returning: true,
+    });
+
+    if (!updatedHeroCount) {
+      return next(createError(404, 'Hero Not Found'));
+    }
+    res.status(200).send({ data: updatedHero });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.deleteHero = async (req, res, next) => {
+  const {
+    params: { heroId },
+  } = req;
+
+  try {
+    const deletedHeroCount = await Hero.destroy({
+      where: {
+        id: heroId,
+      },
+    });
+
+    if (!deletedHeroCount) {
+      return next(createError(404, 'Hero Not Found'));
+    }
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
