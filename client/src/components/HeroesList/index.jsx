@@ -7,7 +7,26 @@ function HeroesList ({ heroes, isFetching, error, getHeroes }) {
     getHeroes()
   }, [])
 
-  return <div>HeroesList</div>
+  const mapHeroes = h => {
+    return (
+      <li key={h.id}>
+        <input type='checkbox' checked={h.isGood} />
+        <h2>{h.nickname}</h2>
+        <div>{h.realName}</div>
+        <div>{h.catchPhrase}</div>
+        <div>{h.originDescription}</div>
+        <button>Delete</button>
+      </li>
+    )
+  }
+
+  return (
+    <>
+      {error && <div>ERROR!!!</div>}
+      {isFetching && <div>Loading...</div>}
+      {!error && !isFetching && <ul>{heroes.map(mapHeroes)}</ul>}
+    </>
+  )
 }
 
 const mapStateToProps = state => state.heroData
