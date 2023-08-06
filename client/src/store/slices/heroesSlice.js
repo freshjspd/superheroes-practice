@@ -18,8 +18,10 @@ export const getHeroesThunk = createAsyncThunk(
   `${HEROES_SLICE_NAME}/get`,
   async (payload, { rejectWithValue }) => {
     try {
-      const gettingData = await httpClient.get('/heroes');
-      return gettingData.data.data; //=> action.payload
+      const {
+        data: { data: gettingData },
+      } = await httpClient.get('/heroes');
+      return gettingData; //=> action.payload
     } catch (err) {
       // err - plain object
       return rejectWithValue({ message: err.message }); //=> action.payload
@@ -30,13 +32,12 @@ export const getHeroesThunk = createAsyncThunk(
 // PATCH /api/heroes/id body
 export const updateHeroThunk = createAsyncThunk(
   `${HEROES_SLICE_NAME}/update`,
-  async (payload, { rejectWithValue }) => {
+  async ({ id, updatedData }, { rejectWithValue }) => {
     try {
-      const updatedHero = await httpClient.patch(
-        `/heroes/${payload.id}`,
-        payload.updatedData
-      );
-      return updatedHero.data.data;
+      const {
+        data: { data: updatedHero },
+      } = await httpClient.patch(`/heroes/${id}`, updatedData);
+      return updatedHero;
     } catch (err) {
       return rejectWithValue({ message: err.message });
     }
@@ -71,14 +72,14 @@ const heroesSlice = createSlice({
       state.error = null;
     });
 
-    builder.addCase(getHeroesThunk.fulfilled, (state, action) => {
+    builder.addCase(getHeroesThunk.fulfilled, (state, { payload }) => {
       state.isFetching = false;
-      state.heroes = [...action.payload];
+      state.heroes = [...payload];
     });
 
-    builder.addCase(getHeroesThunk.rejected, (state, acton) => {
+    builder.addCase(getHeroesThunk.rejected, (state, { payload }) => {
       state.isFetching = false;
-      state.error = acton.payload;
+      state.error = payload;
     });
 
     // PATCH
@@ -87,18 +88,16 @@ const heroesSlice = createSlice({
       state.error = null;
     });
 
-    builder.addCase(updateHeroThunk.fulfilled, (state, action) => {
+    builder.addCase(updateHeroThunk.fulfilled, (state, { payload }) => {
       state.isFetching = false;
-      const updatedHeroIndex = state.heroes.findIndex(
-        h => h.id === action.payload.id
-      );
+      const updatedHeroIndex = state.heroes.findIndex(h => h.id === payload.id);
 
-      state.heroes[updatedHeroIndex] = { ...action.payload };
+      state.heroes[updatedHeroIndex] = { ...payload };
     });
 
-    builder.addCase(updateHeroThunk.rejected, (state, acton) => {
+    builder.addCase(updateHeroThunk.rejected, (state, { payload }) => {
       state.isFetching = false;
-      state.error = acton.payload;
+      state.error = payload;
     });
 
     // DELETE
@@ -107,17 +106,15 @@ const heroesSlice = createSlice({
       state.error = null;
     });
 
-    builder.addCase(deleteHeroThunk.fulfilled, (state, action) => {
-      const deletedHeroIndex = state.heroes.findIndex(
-        h => h.id === action.payload
-      );
+    builder.addCase(deleteHeroThunk.fulfilled, (state, { payload }) => {
+      const deletedHeroIndex = state.heroes.findIndex(h => h.id === payload);
       state.heroes.splice(deletedHeroIndex, 1);
       state.isFetching = false;
     });
 
-    builder.addCase(deleteHeroThunk.rejected, (state, acton) => {
+    builder.addCase(deleteHeroThunk.rejected, (state, { payload }) => {
       state.isFetching = false;
-      state.error = acton.payload;
+      state.error = payload;
     });
   },
 });
