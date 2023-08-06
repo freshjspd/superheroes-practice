@@ -5,6 +5,8 @@ const httpClient = axios.create({
   baseURL: 'http://localhost:5001/api',
 });
 
+const HEROES_SLICE_NAME = 'heroes';
+
 const initialState = {
   heroes: [],
   isFetching: false,
@@ -13,7 +15,7 @@ const initialState = {
 
 // getHeroesThunk() => {type: 'heroes/get'}
 export const getHeroesThunk = createAsyncThunk(
-  'heroes/get',
+  `${HEROES_SLICE_NAME}/get`,
   async (payload, { rejectWithValue }) => {
     try {
       const gettingData = await httpClient.get('/heroes');
@@ -25,8 +27,22 @@ export const getHeroesThunk = createAsyncThunk(
   }
 );
 
+// DELETE /api/heroes/id
+export const deleteHeroThunk = createAsyncThunk(
+  `${HEROES_SLICE_NAME}/delete`,
+  async (payload, rejectWithValue) => {
+    // id
+    try {
+      await httpClient.delete(`/heroes/${payload}`);
+      return payload;
+    } catch (err) {
+      return rejectWithValue({ message: err.message });
+    }
+  }
+);
+
 const heroesSlice = createSlice({
-  name: 'heroes',
+  name: `${HEROES_SLICE_NAME}`,
   initialState,
   // если локальное изменение состояния или была загрузка сагами, ...
   // reducers: (state, action) => state,
@@ -45,6 +61,25 @@ const heroesSlice = createSlice({
     });
 
     builder.addCase(getHeroesThunk.rejected, (state, acton) => {
+      state.isFetching = false;
+      state.error = acton.payload;
+    });
+
+    // DELETE
+    builder.addCase(deleteHeroThunk.pending, state => {
+      state.isFetching = true;
+      state.error = null;
+    });
+
+    builder.addCase(deleteHeroThunk.fulfilled, (state, action) => {
+      const deletedHeroIndex = state.heroes.findIndex(
+        h => h.id === action.payload
+      );
+      state.heroes.splice(deletedHeroIndex, 1);
+      state.isFetching = false;
+    });
+
+    builder.addCase(deleteHeroThunk.rejected, (state, acton) => {
       state.isFetching = false;
       state.error = acton.payload;
     });

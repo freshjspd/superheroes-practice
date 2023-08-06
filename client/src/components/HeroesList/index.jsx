@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
-import { getHeroesThunk } from '../../store/slices/heroesSlice'
+import { deleteHeroThunk, getHeroesThunk } from '../../store/slices/heroesSlice'
 
-function HeroesList ({ heroes, isFetching, error, getHeroes }) {
+function HeroesList ({ heroes, isFetching, error, getHeroes, deleteHero }) {
   useEffect(() => {
     getHeroes()
   }, [])
@@ -12,10 +12,11 @@ function HeroesList ({ heroes, isFetching, error, getHeroes }) {
       <li key={h.id}>
         <input type='checkbox' checked={h.isGood} />
         <h2>{h.nickname}</h2>
+        <div>{h.id}</div>
         <div>{h.realName}</div>
         <div>{h.catchPhrase}</div>
         <div>{h.originDescription}</div>
-        <button>Delete</button>
+        <button onClick={() => deleteHero(h.id)}>Delete</button>
       </li>
     )
   }
@@ -33,7 +34,8 @@ const mapStateToProps = state => state.heroData
 
 const mapDispatchToProps = dispatch => {
   return {
-    getHeroes: () => dispatch(getHeroesThunk()) // dispatch( {type: 'heroes/get'})
+    getHeroes: () => dispatch(getHeroesThunk()), // dispatch( {type: 'heroes/get'})
+    deleteHero: id => dispatch(deleteHeroThunk(id)) // to 1st param function in thunk
   }
 }
 
