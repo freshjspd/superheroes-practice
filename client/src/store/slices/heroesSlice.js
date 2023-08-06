@@ -27,10 +27,26 @@ export const getHeroesThunk = createAsyncThunk(
   }
 );
 
+// PATCH /api/heroes/id body
+export const updateHeroThunk = createAsyncThunk(
+  `${HEROES_SLICE_NAME}/update`,
+  async (payload, { rejectWithValue }) => {
+    try {
+      const updatedHero = await httpClient.patch(
+        `/heroes/${payload.id}`,
+        payload.updatedData
+      );
+      return updatedHero.data.data;
+    } catch (err) {
+      return rejectWithValue({ message: err.message });
+    }
+  }
+);
+
 // DELETE /api/heroes/id
 export const deleteHeroThunk = createAsyncThunk(
   `${HEROES_SLICE_NAME}/delete`,
-  async (payload, rejectWithValue) => {
+  async (payload, { rejectWithValue }) => {
     // id
     try {
       await httpClient.delete(`/heroes/${payload}`);
@@ -61,6 +77,26 @@ const heroesSlice = createSlice({
     });
 
     builder.addCase(getHeroesThunk.rejected, (state, acton) => {
+      state.isFetching = false;
+      state.error = acton.payload;
+    });
+
+    // PATCH
+    builder.addCase(updateHeroThunk.pending, state => {
+      state.isFetching = true;
+      state.error = null;
+    });
+
+    builder.addCase(updateHeroThunk.fulfilled, (state, action) => {
+      state.isFetching = false;
+      const updatedHeroIndex = state.heroes.findIndex(
+        h => h.id === action.payload.id
+      );
+
+      state.heroes[updatedHeroIndex] = { ...action.payload };
+    });
+
+    builder.addCase(updateHeroThunk.rejected, (state, acton) => {
       state.isFetching = false;
       state.error = acton.payload;
     });
