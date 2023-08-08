@@ -28,12 +28,13 @@ function HeroesList ({
             updateHero(h.id, { isGood: !h.isGood })
           }}
         />
-        <h2>{h.nickname}</h2>
-        <div>{h.id}</div>
-        <div>{h.realName}</div>
-        <div>{h.catchPhrase}</div>
-        <div>{h.originDescription}</div>
+        <div>id: {h.id}</div>
+        <h2>Nickname: {h.nickname}</h2>
+        <div>Real name: {h.realName}</div>
+        <div>Catch phrase: {h.catchPhrase}</div>
+        <div>Origin: {h.originDescription}</div>
         <button onClick={() => deleteHero(h.id)}>Delete</button>
+        <hr />
       </li>
     )
   }
