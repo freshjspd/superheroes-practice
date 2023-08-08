@@ -1,9 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const httpClient = axios.create({
-  baseURL: 'http://localhost:5001/api',
-});
+import * as API from '../../api';
 
 const HEROES_SLICE_NAME = 'heroes';
 
@@ -19,7 +15,7 @@ export const createHeroThunk = createAsyncThunk(
     try {
       const {
         data: { data: createdUser },
-      } = await httpClient.post('/heroes', payload);
+      } = await API.createHero(payload);
 
       return createdUser;
     } catch (err) {
@@ -35,7 +31,7 @@ export const getHeroesThunk = createAsyncThunk(
     try {
       const {
         data: { data: gettingData },
-      } = await httpClient.get('/heroes');
+      } = await API.getHeroes();
       return gettingData; //=> action.payload
     } catch (err) {
       // err - plain object
@@ -51,7 +47,7 @@ export const updateHeroThunk = createAsyncThunk(
     try {
       const {
         data: { data: updatedHero },
-      } = await httpClient.patch(`/heroes/${id}`, updatedData);
+      } = await API.updateHero(id, updatedData);
       return updatedHero;
     } catch (err) {
       return rejectWithValue({ message: err.message });
@@ -65,7 +61,7 @@ export const deleteHeroThunk = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     // id
     try {
-      await httpClient.delete(`/heroes/${payload}`);
+      await API.deleteHero(payload);
       return payload;
     } catch (err) {
       return rejectWithValue({ message: err.message });
