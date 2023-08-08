@@ -13,6 +13,21 @@ const initialState = {
   error: null,
 };
 
+export const createHeroThunk = createAsyncThunk(
+  `${HEROES_SLICE_NAME}/create`,
+  async (payload, { rejectWithValue }) => {
+    try {
+      const {
+        data: { data: createdUser },
+      } = await httpClient.post('/heroes', payload);
+
+      return createdUser;
+    } catch (err) {
+      return rejectWithValue({ message: err.message });
+    }
+  }
+);
+
 // getHeroesThunk() => {type: 'heroes/get'}
 export const getHeroesThunk = createAsyncThunk(
   `${HEROES_SLICE_NAME}/get`,
@@ -65,6 +80,20 @@ const heroesSlice = createSlice({
   // reducers: (state, action) => state,
   // если загрузка чанками
   extraReducers: builder => {
+    // POST
+    builder.addCase(createHeroThunk.pending, state => {
+      state.isFetching = true;
+      state.error = null;
+    });
+    builder.addCase(createHeroThunk.fulfilled, (state, { payload }) => {
+      state.isFetching = false;
+      state.heroes.push(payload);
+    });
+    builder.addCase(createHeroThunk.rejected, (state, { payload }) => {
+      state.isFetching = false;
+      state.error = payload;
+    });
+
     // GET
     // builder.addCase('heroes/get/pending', );
     builder.addCase(getHeroesThunk.pending, state => {

@@ -1,7 +1,9 @@
 import React from 'react'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
+import { connect } from 'react-redux'
+import { createHeroThunk } from '../../store/slices/heroesSlice'
 
-function HeroForm () {
+function HeroForm ({ createHero }) {
   const initialValues = {
     nickname: '',
     realName: '',
@@ -10,7 +12,10 @@ function HeroForm () {
     isGood: true
   }
 
-  const handleSubmit = (values, formikBag) => {}
+  const handleSubmit = (values, formikBag) => {
+    createHero(values)
+    formikBag.resetForm()
+  }
 
   return (
     <Formik initialValues={initialValues} onSubmit={handleSubmit}>
@@ -48,4 +53,10 @@ function HeroForm () {
   )
 }
 
-export default HeroForm
+const mapStateToProps = ({ heroData }) => heroData
+
+const mapDispatchToProps = dispatch => ({
+  createHero: data => dispatch(createHeroThunk(data))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(HeroForm)
