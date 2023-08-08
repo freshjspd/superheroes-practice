@@ -5,6 +5,7 @@ import {
   getHeroesThunk,
   updateHeroThunk
 } from '../../store/slices/heroesSlice'
+import defaultHeroPhoto from './default-photo.jpeg'
 
 function HeroesList ({
   heroes,
@@ -21,6 +22,16 @@ function HeroesList ({
   const mapHeroes = h => {
     return (
       <li key={h.id}>
+        <img
+          src={h.image ? `http://localhost:5001/${h.image}` : defaultHeroPhoto}
+          alt={h.nickname}
+          style={{
+            width: '100px',
+            height: '100px',
+            objectFit: 'cover',
+            borderRadius: '50%'
+          }}
+        />
         <input
           type='checkbox'
           checked={h.isGood}
