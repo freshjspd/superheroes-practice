@@ -6,8 +6,8 @@ const heroesRouter = Router();
 
 heroesRouter
   .route('/')
-  // .post(upload.uploadHeroFile, heroesController.createHero)
-  .post(heroesController.createHero)
+  .post(upload.uploadHeroFile, heroesController.createHero) // Multipart/form-data
+  // .post(heroesController.createHero) // Application-json
   .get(heroesController.getHeroes);
 
 heroesRouter

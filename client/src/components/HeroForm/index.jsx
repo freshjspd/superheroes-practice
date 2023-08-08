@@ -9,11 +9,26 @@ function HeroForm ({ createHero }) {
     realName: '',
     originDescription: '',
     catchPhrase: '',
-    isGood: true
+    isGood: true,
+    heroPhoto: ''
   }
 
   const handleSubmit = (values, formikBag) => {
-    createHero(values)
+    // js-object => application/json => req.body
+    // createHero(values)
+
+    // formData (с files) => multipart/form-data
+    const formData = new FormData()
+    // multer: formData(text) => req.body
+    formData.append('nickname', values.nickname)
+    formData.append('realName', values.realName)
+    formData.append('originDescription', values.originDescription)
+    formData.append('catchPhrase', values.catchPhrase)
+    formData.append('isGood', values.isGood)
+    // multer: formData(file) => req.file
+    formData.append('heroPhoto', values.heroPhoto)
+
+    createHero(formData)
     formikBag.resetForm()
   }
 
@@ -45,6 +60,16 @@ function HeroForm ({ createHero }) {
             <Field type='checkbox' name='isGood' />
             <span>Is hero positive</span>
             <br />
+          </label>
+          <label>
+            <span>Hero photo:</span>
+            <input
+              type='file'
+              name='heroPhoto'
+              onChange={e => {
+                formikProps.setFieldValue('heroPhoto', e.target.files[0])
+              }}
+            />
           </label>
           <button type='submit'>Create</button>
         </Form>
