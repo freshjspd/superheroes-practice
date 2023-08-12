@@ -1,10 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import heroesReducer from './slices/heroesSlice';
+import powersReducer from './slices/powersSlice';
 
 // reducer - функция, как метнять общее состояние
 const reducer = {
   heroData: heroesReducer,
-  // powersData: powersReducer,
+  powersData: powersReducer,
 };
 
 const store = configureStore({ reducer });

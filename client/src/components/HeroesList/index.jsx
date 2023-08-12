@@ -6,16 +6,18 @@ import {
   updateHeroThunk
 } from '../../store/slices/heroesSlice'
 import defaultHeroPhoto from './default-photo.jpeg'
+import { getPowersThunk } from '../../store/slices/powersSlice'
 
 function HeroesList ({
-  heroes,
-  isFetching,
-  error,
+  powersData: { powers },
+  heroData: { isFetching, error, heroes },
+  getPowers,
   getHeroes,
   deleteHero,
   updateHero
 }) {
   useEffect(() => {
+    getPowers()
     getHeroes()
   }, [])
 
@@ -44,6 +46,14 @@ function HeroesList ({
         <div>Real name: {h.realName}</div>
         <div>Catch phrase: {h.catchPhrase}</div>
         <div>Origin: {h.originDescription}</div>
+        <ol>
+          {powers.length &&
+            h.superpowers.map(p => (
+              <li key={p}>
+                {powers[powers.findIndex(i => p === i.id)].description}
+              </li>
+            ))}
+        </ol>
         <button onClick={() => deleteHero(h.id)}>Delete</button>
         <hr />
       </li>
@@ -59,10 +69,14 @@ function HeroesList ({
   )
 }
 
-const mapStateToProps = state => state.heroData
+const mapStateToProps = ({ powersData, heroData }) => ({
+  powersData,
+  heroData
+})
 
 const mapDispatchToProps = dispatch => {
   return {
+    getPowers: () => dispatch(getPowersThunk()),
     getHeroes: () => dispatch(getHeroesThunk()), // dispatch( {type: 'heroes/get'})
     updateHero: (id, updatedData) =>
       dispatch(updateHeroThunk({ id, updatedData })),

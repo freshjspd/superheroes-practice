@@ -3,14 +3,15 @@ import { Formik, Form, Field, ErrorMessage } from 'formik'
 import { connect } from 'react-redux'
 import { createHeroThunk } from '../../store/slices/heroesSlice'
 
-function HeroForm ({ createHero }) {
+function HeroForm ({ createHero, powers }) {
   const initialValues = {
     nickname: '',
     realName: '',
     originDescription: '',
     catchPhrase: '',
     isGood: true,
-    heroPhoto: ''
+    heroPhoto: '',
+    superpowers: []
   }
 
   const handleSubmit = (values, formikBag) => {
@@ -25,12 +26,20 @@ function HeroForm ({ createHero }) {
     formData.append('originDescription', values.originDescription)
     formData.append('catchPhrase', values.catchPhrase)
     formData.append('isGood', values.isGood)
+    values.superpowers.forEach(s => formData.append('superpowers', s))
     // multer: formData(file) => req.file
     formData.append('heroPhoto', values.heroPhoto)
 
     createHero(formData)
     formikBag.resetForm()
   }
+
+  const mapPowers = p => (
+    <label key={p.id}>
+      <Field type='checkbox' name='superpowers' value={String(p.id)} />
+      <span>{p.description}</span>
+    </label>
+  )
 
   return (
     <Formik initialValues={initialValues} onSubmit={handleSubmit}>
@@ -61,6 +70,9 @@ function HeroForm ({ createHero }) {
             <span>Is hero positive</span>
             <br />
           </label>
+          <br />
+          {powers.map(mapPowers)}
+          <br />
           <label>
             <span>Hero photo:</span>
             <input
@@ -78,7 +90,7 @@ function HeroForm ({ createHero }) {
   )
 }
 
-const mapStateToProps = ({ heroData }) => heroData
+const mapStateToProps = ({ powersData }) => powersData
 
 const mapDispatchToProps = dispatch => ({
   createHero: data => dispatch(createHeroThunk(data))

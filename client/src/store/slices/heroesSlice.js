@@ -117,7 +117,10 @@ const heroesSlice = createSlice({
       state.isFetching = false;
       const updatedHeroIndex = state.heroes.findIndex(h => h.id === payload.id);
 
-      state.heroes[updatedHeroIndex] = { ...payload };
+      state.heroes[updatedHeroIndex] = {
+        ...state.heroes[updatedHeroIndex],
+        ...payload,
+      };
     });
 
     builder.addCase(updateHeroThunk.rejected, (state, { payload }) => {

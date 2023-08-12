@@ -1,7 +1,7 @@
 const createHttpError = require('http-errors');
 const path = require('path');
 const _ = require('lodash');
-const { Hero } = require('./../db/models');
+const { Hero, Power, sequelize } = require('./../db/models');
 const { IMAGES_FOLDER } = require('./../constants');
 
 module.exports.createHero = async (req, res, next) => {
@@ -11,17 +11,23 @@ module.exports.createHero = async (req, res, next) => {
     body.image = path.join(IMAGES_FOLDER, file.filename);
   }
 
+  if (!body.superpowers) {
+    body.superpowers = [];
+  }
+
+  const t = await sequelize.transaction();
   try {
-    const createdHero = await Hero.create(body);
+    const createdHero = await Hero.create(body, { transaction: t });
+    const createdHeroPowers = await createdHero.setPowers(body.superpowers, {
+      transaction: t,
+    });
+    t.commit();
+    const preparedHero = _.omit(createdHero.get(), ['createdAt', 'updatedAt']);
 
-    if (!createdHero) {
-      return next(createHttpError(500, 'Server Error'));
-    }
-
-    const preparedHaro = _.omit(createdHero.get(), ['createdAt', 'updatedAt']);
-
-    res.status(201).send({ data: preparedHaro });
+    preparedHero.superpowers = body.superpowers.map(s => Number(s));
+    res.status(200).send({ data: preparedHero });
   } catch (err) {
+    t.rollback();
     next(err);
   }
 };
@@ -29,11 +35,29 @@ module.exports.createHero = async (req, res, next) => {
 module.exports.getHeroes = async (req, res, next) => {
   try {
     const foundHeroes = await Hero.findAll({
-      order: ['id'],
+      raw: true,
       attributes: { exclude: ['createdAt', 'updatedAt'] },
+      include: {
+        model: Power,
+        attributes: {
+          exclude: ['description', 'fullDescription', 'createdAt', 'updatedAt'],
+        },
+        through: { attributes: [] },
+      },
     });
 
-    res.status(200).send({ data: foundHeroes });
+    const singleFoundHeroes = {};
+    foundHeroes.forEach(i => {
+      singleFoundHeroes[i.id] = i;
+      singleFoundHeroes[i.id].superpowers = [];
+    });
+    foundHeroes.forEach(i => {
+      i['Powers.id'] &&
+        singleFoundHeroes[i.id].superpowers.push(i['Powers.id']);
+      delete i['Powers.id'];
+    });
+
+    res.status(200).send({ data: Object.values(singleFoundHeroes) });
   } catch (err) {
     next(err);
   }

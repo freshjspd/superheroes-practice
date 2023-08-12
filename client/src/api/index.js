@@ -16,3 +16,5 @@ export const getHeroes = () => httpClient.get('/heroes');
 export const updateHero = (id, data) => httpClient.patch(`/heroes/${id}`, data);
 
 export const deleteHero = id => httpClient.delete(`/heroes/${id}`);
+
+export const getPowers = () => httpClient.get('/powers');
